@@ -1,0 +1,11 @@
+# requirements.txt
+requests==2.31.0        # Библиотека для HTTP-запросов
+flask==3.0.0            # Легкий веб-фреймворк для API (альтернатива - FastAPI)
+transformers==4.31.0    # Hugging Face для загрузки и работы с LLM
+torch>=2.0.0            # PyTorch для LLaMa и других моделей
+spacy==3.5.3            # Библиотека для обработки и анализа текста
+pandas==1.5.3           # Библиотека для работы с табличными данными
+accelerate
+langchain~=0.3.8
+langgraph~=0.2.53
+pydantic~=2.10.1
