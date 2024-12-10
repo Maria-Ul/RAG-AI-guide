@@ -6,7 +6,7 @@ from config import *
 
 # Токен бота
 #  t.me/ultrapro14maxtripbot
-BOT_TOKEN = '8155752778:AAG6vjt2HjuauG_i7h_0BVkDKbewvnWaz7c'
+BOT_TOKEN = os.getenv('BOT_TOKEN')
 
 # Инициализация бота и диспетчера
 bot = Bot(BOT_TOKEN)
