@@ -1,21 +1,8 @@
-# from flask import Flask, request, jsonify
-# from src.rag.rag_guide import get_chain, get_data, get_retriever, get_retrieval_chain, chat
-#
-# app = Flask(__name__)
-#
-# # Инициализация RAG-агента
-# def init_rag_agent():
-#     # Получаем данные, retriever, цепочку документов, цепочку поиска
-#     train_dataset = get_data()
-#     print("Get data")
-#     retriever = get_retriever(train_dataset)
-#     print("Get retriever")
-#     document_chain = get_chain()
-#     print("Get chain")
-#     retrieval_chain = get_retrieval_chain(retriever, document_chain)
-#     print("Get retrieval_chain")
-#     return retrieval_chain
-#
+from flask import Flask, request, jsonify
+from src.rag.rag_guide import get_data, get_retriever, get_chain, get_retrieval_chain, chat
+
+app = Flask(__name__)
+
 # @app.route('/generate_text', methods=['POST'])
 # def generate_text():
 #     try:
@@ -27,28 +14,22 @@
 #         if not user_question:
 #             return jsonify({"error": "Question is required"}), 400
 #
-#         # Получаем retrieval_chain для генерации ответа
-#         retrieval_chain = init_rag_agent()
-#
 #         # Используем RAG-агент для ответа
-#         print("Calling chat function with the question...")
+#         retrieval_chain = app.config['retrieval_chain']
 #         answer = chat(user_question, retrieval_chain=retrieval_chain)
 #         print(f"Generated answer: {answer}")
-#         # Возвращаем ответ в формате JSON
-#         return jsonify({"answer": answer})
+#
+#         # Убедимся, что возвращаем только текст
+#         if isinstance(answer, str):
+#             clean_answer = answer.strip('"')  # Убираем лишние кавычки
+#             return jsonify({"answer": clean_answer})
+#         else:
+#             print("Unexpected answer format:", answer)
+#             return jsonify({"error": "Invalid response format"}), 500
 #
 #     except Exception as e:
+#         print(f"Error: {e}")
 #         return jsonify({"error": str(e)}), 500
-#
-#
-# if __name__ == '__main__':
-#     # Запуск приложения Flask
-#     app.run(host="0.0.0.0", port=8000, debug=True)
-
-from flask import Flask, request, jsonify
-from src.rag.rag_guide import get_data, get_retriever, get_chain, get_retrieval_chain, chat
-
-app = Flask(__name__)
 
 @app.route('/generate_text', methods=['POST'])
 def generate_text():
@@ -61,16 +42,22 @@ def generate_text():
         if not user_question:
             return jsonify({"error": "Question is required"}), 400
 
-        # Используем RAG-агент для ответа
+        # Генерация ответа через RAG-агент
+        print("Calling chat function with the question...")
         answer = chat(user_question, retrieval_chain=retrieval_chain)
         print(f"Generated answer: {answer}")
 
-        # Возвращаем ответ в формате JSON
-        return jsonify({"answer": answer})
+        # Убедимся, что возвращаем только текст
+        if isinstance(answer, str):
+            clean_answer = answer.strip('"')  # Убираем лишние кавычки
+            return jsonify({"answer": clean_answer})
+        else:
+            print("Unexpected answer format:", answer)
+            return jsonify({"error": "Invalid response format"}), 500
 
     except Exception as e:
-        print(f"Error: {e}")
-        return jsonify({"error": str(e)}), 500
+        print(f"Error occurred: {e}")
+        return jsonify({"error": "Sorry, something went wrong."}), 500
 
 
 if __name__ == '__main__':
@@ -87,6 +74,7 @@ if __name__ == '__main__':
 
     retrieval_chain = get_retrieval_chain(retriever, document_chain)
     print('Retrieval chain ready')
+    app.config['retrieval_chain'] = retrieval_chain
 
     # Запуск Flask-приложения
     app.run(host="0.0.0.0", port=8000)

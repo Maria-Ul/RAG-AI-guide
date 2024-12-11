@@ -2,11 +2,12 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.filters.command import Command
 import asyncio
 import aiohttp
-from config import *
-
+# from config import *
+import os
 # Токен бота
 #  t.me/ultrapro14maxtripbot
 BOT_TOKEN = os.getenv('BOT_TOKEN')
+
 
 # Инициализация бота и диспетчера
 bot = Bot(BOT_TOKEN)

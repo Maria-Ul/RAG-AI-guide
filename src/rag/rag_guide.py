@@ -10,8 +10,7 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint
 from langchain.schema import HumanMessage, SystemMessage, AIMessage
-from multiprocessing import Pool
-import time
+
 import os
 hf_token = os.getenv("HF_TOKEN")
 
@@ -84,14 +83,9 @@ def process_data(train_dataset, embedding_model_name, chunk_size, chunk_overlap_
     print("init all_splits ")
     try:
         faiss_cosine = FAISS.from_documents(all_splits, embedding_model, distance_strategy=DistanceStrategy.COSINE)
+        return faiss_cosine
     except Exception as e:
         print(f"Error creating FAISS index: {e}")
-    # faiss_cosine = FAISS.from_documents(all_splits, embedding_model, distance_strategy=DistanceStrategy.COSINE)
-    # print("faiss is not none")
-    # if faiss_cosine is None:
-    #     raise ValueError("faiss_cosine is None, check the FAISS creation process")
-
-    return faiss_cosine
 
 
 def get_retriever(train_dataset):
@@ -101,13 +95,10 @@ def get_retriever(train_dataset):
     chunk_size = 350
     chunk_overlap_scale = 0.1
 
-    # Переносим использование multiprocessing в блок __main__
-    faiss_cosine = None
-    # if __name__ == '__main__':
-    with Pool() as pool:
-        print('start pool')
-        faiss_cosine = pool.apply(process_data, args=(train_dataset, embedding_model_name, chunk_size, chunk_overlap_scale))
-        print('get  faiss')
+    faiss_cosine = process_data(train_dataset, embedding_model_name, chunk_size, chunk_overlap_scale)
+    if not faiss_cosine:
+        raise ValueError("FAISS index creation failed.")
+    print('get  faiss')
     return faiss_cosine.as_retriever(k=top_k)
 
 
@@ -134,5 +125,4 @@ def chat(user_input, retrieval_chain, history=False):
         return result['answer']
     except Exception as e:
         print(f"Error: {str(e)}")
-    # print(f"result : {result['answer']} type {type(result['answer'])}")
-    # return result['answer']
+
