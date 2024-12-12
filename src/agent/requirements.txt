@@ -9,3 +9,9 @@ accelerate
 langchain~=0.3.8
 langgraph~=0.2.53
 pydantic~=2.10.1
+pyowm
+langchain-anthropic
+tavily-python
+langgraph-checkpoint-sqlite
+wikipedia
+# pip install --upgrade --quiet "wikibase-rest-api-client<0.2" mediawikiapi 
